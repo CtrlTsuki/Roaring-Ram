@@ -1,4 +1,5 @@
 import { app, BrowserWindow, dialog, ipcMain, Menu, nativeImage, shell, Tray, type IpcMainInvokeEvent } from 'electron'
+import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { formatBytes, formatPercent } from '../shared/format'
@@ -17,8 +18,12 @@ let platform: Platform
 let quitting = false
 
 const shotsDir = !app.isPackaged ? process.env.RR_SHOTS : undefined
+// RR_SMOKE=<file>: start, take one reading, write a short report there and quit. Read-only; used to
+// check a packaged build really loads its native code and can read memory.
+const smokeFile = process.env.RR_SMOKE
 // Screenshot runs keep their own settings, so they never touch the person's seals or log.
 if (shotsDir) app.setPath('userData', path.join(os.tmpdir(), 'rr-shots', 'user-data'))
+if (smokeFile) app.setPath('userData', path.join(os.tmpdir(), 'rr-smoke', 'user-data'))
 
 if (!app.requestSingleInstanceLock()) {
   // A second R.R. would fight the first over the same seals.
@@ -38,6 +43,16 @@ async function boot(): Promise<void> {
   createWindow()
   createTray()
   engine.start(VISIBLE_MS)
+  if (smokeFile) {
+    setTimeout(async () => {
+      const s = engine.snapshot()
+      const report = { ok: !s.error, error: s.error, platform: platform.caps.platformName, totalPhys: s.sys.totalPhys, used: s.sys.used, processes: s.processCount, apps: s.apps.length, packaged: app.isPackaged }
+      fs.writeFileSync(smokeFile, JSON.stringify(report))
+      // A picture of the window too, to confirm the interface itself loaded.
+      if (win) fs.writeFileSync(smokeFile.replace(/\.json$/i, '') + '.png', (await win.webContents.capturePage()).toPNG())
+      quit()
+    }, 5000)
+  }
   if (shotsDir && win) {
     const target = win
     target.webContents.once('did-finish-load', async () => {
