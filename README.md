@@ -1,7 +1,44 @@
-# R.R. (Roaring Ram)
+<p align="center">
+  <img src="resources/icon.png" width="88" alt="R.R. icon: a dark vessel with a lit waterline">
+</p>
 
-A dark-mode desktop app that shows where your RAM goes and takes only the memory actions Windows
-actually supports, telling you plainly what each one did and what it could not do.
+<h1 align="center">R.R. (Roaring Ram)</h1>
+
+<p align="center">
+  <strong>See which app is eating your RAM, give it a limit Windows will enforce, and measure what changed.</strong>
+</p>
+
+<p align="center">
+  <a href="https://github.com/CtrlTsuki/Roaring-Ram/releases/latest"><img alt="Download for Windows 10 and 11" src="https://img.shields.io/badge/download-Windows%2010%20%2F%2011-7fe6f5?style=for-the-badge&logo=windows&logoColor=white&labelColor=0b0c0e"></a>
+  <img alt="Runs without admin rights" src="https://img.shields.io/badge/admin%20rights-not%20needed-f3f4f6?style=for-the-badge&labelColor=0b0c0e">
+</p>
+
+<p align="center">
+  <img src="docs/screenshot.png" width="880" alt="R.R. showing 13.5 GB of 15.8 GB in use as a dark fountain column, with the five-minute history beside it">
+</p>
+
+Task Manager will show you that Chrome is holding 3 GB, and its only fix is End task. Trimming
+memory makes the number drop for a while, but apps pull their pages back as soon as they use them.
+R.R. sticks to the limits Windows itself provides and tells you whether each one is in force.
+
+- **Limits that say whether they hold.** A hard cap makes Windows refuse an app's allocations past
+  the line; a ceiling keeps each of its processes under it by paging. Each one reads "Enforced by
+  Windows", "Partly enforced" or "Watching only", depending on what Windows accepted.
+- **Cleanups with receipts.** Titan trims one app and The Roaring trims every app R.R. can reach.
+  Both measure before, after, and again 30 seconds later, so you can see how much came back.
+- **Your work stays open.** R.R. never ends a process and never touches Windows components. Closing
+  an app is your choice, one app at a time, and the app can still ask you to save.
+
+## Get it
+
+Download `RoaringRam-0.1.0-portable.exe` from
+[Releases](https://github.com/CtrlTsuki/Roaring-Ram/releases/latest) and double-click it. There's
+nothing to install, and it runs as a normal user.
+
+The app isn't code-signed yet, so Windows SmartScreen warns the first time: choose **More info**,
+then **Run anyway**.
+
+## What's in the window
 
 | Part of the app | What it is |
 | --- | --- |
@@ -13,7 +50,7 @@ actually supports, telling you plainly what each one did and what it could not d
 | **The Roaring** | One-shot, system-wide pass of supported reclamation, with a preview and confirmation first. |
 | **Echoes** | A quiet activity log: time, action, measured change, and every limitation or refusal. |
 
-## Run it
+## Build from source
 
 Requires Windows 10/11 x64 and Node 22 or later.
 
@@ -25,16 +62,15 @@ npm install
 npm run dev
 ```
 
-Other scripts: `npm test` (unit and Win32 integration tests), `npm run typecheck`, `npm run build`
-then `npm start` (runs the built app). On first run, `npm run dev` downloads the Electron binary if
-npm's install-script gate skipped it.
+`npm run package` builds the portable `.exe` into `dist/`. Other scripts: `npm test` (unit and Win32
+integration tests), `npm run typecheck`, and `npm run build` then `npm start` to run the built app.
+On first run, `npm run dev` downloads the Electron binary if npm's install-script gate skipped it.
 
 R.R. runs as a standard user and never asks for elevation. Run it as administrator only if you
 want it to reach elevated apps; it still never touches Windows components.
 
-**Stack:** Electron 45, React 19, TypeScript, electron-vite, and [koffi](https://koffi.dev) for direct
-Win32 calls (no native compilation). Chosen because the folder was empty, Node was installed and Rust
-was not, and koffi reaches every API below from a standard Node runtime.
+Built with Electron 45, React 19, TypeScript and electron-vite. [koffi](https://koffi.dev) calls the
+Win32 memory APIs directly from Node, so there is no native code to compile.
 
 ## What Windows really lets a desktop app do
 
@@ -126,7 +162,7 @@ Linux cgroup v2 limits exist but only for apps launched inside a cgroup; that is
 - **The blade:** a thin edge of light crosses confirm buttons for deliberate actions.
 - **Echoes:** kind labels briefly resolve from scrambled glyphs when an entry first appears.
   Decorative only: values are never scrambled, and reduced motion turns it off.
-- **Motion:** 140–280 ms, transform and opacity only, interruptible, all reduced-motion aware.
+- **Motion:** 140 to 280 ms, transform and opacity only, interruptible, all reduced-motion aware.
 - **Lore** (see `reports/`) guided names and metaphors only; nothing from the game appears in the UI.
   In the released chapters, "the Roaring" is the prophesied catastrophe and sealing is how darkness is
   closed. That is why limits are **Seals**. The system-wide cleanup keeps the requested name **The
@@ -148,3 +184,7 @@ scripts/make-icons.mjs Draws the app and tray icons
 `RR_SHOTS=<folder> npx electron .` (development only) drives the window through its main states
 and saves screenshots. It acts only on a test process it starts itself, uses a separate settings
 folder, and previews The Roaring without running it.
+
+## License
+
+[MIT](LICENSE). Use it, change it, share it; keep the copyright notice.

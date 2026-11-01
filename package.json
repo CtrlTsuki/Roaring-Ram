@@ -3,6 +3,13 @@
   "productName": "R.R.",
   "version": "0.1.0",
   "description": "R.R. (Roaring Ram): see where your RAM goes and take supported actions to reduce it.",
+  "license": "MIT",
+  "author": "CtrlTsuki",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CtrlTsuki/Roaring-Ram.git"
+  },
+  "homepage": "https://github.com/CtrlTsuki/Roaring-Ram",
   "main": "./out/main/index.js",
   "private": true,
   "scripts": {
